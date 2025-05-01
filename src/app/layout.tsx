@@ -1,9 +1,8 @@
 import { metadata } from '@/app/metadata';
 import Layout from '@/layout';
-import Providers from '@/providers/AppProviders';
 import '@/assets/styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
-
+import { Web3Provider } from '@/providers/AppProviders';
 export { metadata };
 
 export default function RootLayout({
@@ -13,10 +12,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
-        <Providers>
+      <body className='font-mono'>
+        <Web3Provider>
           <Layout>{children}</Layout>
-        </Providers>
+        </Web3Provider>
       </body>
     </html>
   );
