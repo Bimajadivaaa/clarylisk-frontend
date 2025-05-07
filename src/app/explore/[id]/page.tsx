@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useCreatorById } from '@/hooks/API/useGetCreatorById';
 import Image from 'next/image';
 import { 
@@ -41,13 +41,14 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { useGetCreatorContract } from "@/hooks/smart-contract/read/useGetCreatorContract";
 import { useDonate } from "@/hooks/smart-contract/write/useDonate";
 import { Input } from "@/components/ui/input";
-import { ethers } from 'ethers';
+import IDRXLogo from "../../../../public/img/IDRXLogo.jpg";
 
 export default function CreatorProfilePage() {
   const params = useParams();
   const creatorId = params?.id as string;
   const { creator, isLoading, error} = useCreatorById(creatorId);
   const [copied, setCopied] = useState(false);
+  const router = useRouter();
 
   console.log('creator id', creatorId);
 
@@ -257,13 +258,32 @@ export default function CreatorProfilePage() {
             </div>
             {/* Creator Contract Address */}
             <div className="mt-2">
-              <span className="text-xs text-gray-400">Creator Contract:</span><br />
+              <span className="text-xs text-gray-400">Creator Contract Address:</span><br />
               {isContractLoading ? (
                 <span className="text-blue-400 text-xs">Loading...</span>
               ) : isContractError ? (
                 <span className="text-red-400 text-xs">{contractError?.message || 'Failed to fetch contract.'}</span>
               ) : contractAddress && contractAddress !== '0x0000000000000000000000000000000000000000' ? (
-                <span className="text-green-400 text-xs break-all">{contractAddress}</span>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-green-400 text-xs font-mono">{truncateAddress(contractAddress)}</span>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6 text-gray-400 hover:text-primary"
+                          onClick={() => copyToClipboard(contractAddress)}
+                        >
+                          {copied ? <Check size={14} /> : <Copy size={14} />}
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Copy contract address</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
               ) : (
                 <span className="text-yellow-400 text-xs">No contract found</span>
               )}
@@ -272,7 +292,7 @@ export default function CreatorProfilePage() {
             {contractAddress && contractAddress !== '0x0000000000000000000000000000000000000000' && (
               <div className="mt-4 p-4 bg-gray-900/50 border border-gray-800 rounded-lg">
                 <div className="flex flex-col gap-2">
-                  <label className="text-xs text-gray-300">Donate IDRX</label>
+                  <label className="text-xs text-gray-300">Donate $IDRX <Image src={IDRXLogo} alt="IDRX" width={15} height={15} className="inline-block rounded-full mb-1" /></label>
                   <Input
                     type="number"
                     min="0"
@@ -444,10 +464,14 @@ export default function CreatorProfilePage() {
               variant="default" 
               size="sm" 
               className="bg-primary hover:bg-primary/80"
-              onClick={() => {/* Connect with creator logic */}}
+              onClick={() => {
+                if (contractAddress && contractAddress !== '0x0000000000000000000000000000000000000000') {
+                  router.push(`/search?wallet=${contractAddress}`);
+                }
+              }}
             >
-              <User size={16} className="mr-2" />
-              Follow Creator
+              <User size={16} className="mr-1" />
+              Track Donation History
             </Button>
           </div>
         </CardContent>
