@@ -1,8 +1,8 @@
 // hooks/useLogin.ts
-import { CLARYLISK_BACKEND } from '@/config/const';
-import { useState, ChangeEvent } from 'react';
-import { useWallet } from '../useWallet';
-import Cookies from 'js-cookie';
+import { CLARYLISK_BACKEND } from "@/config/const";
+import { useState, ChangeEvent } from "react";
+import { useWallet } from "../useWallet";
+import Cookies from "js-cookie";
 
 interface LoginCredentials {
   walletAddress: string;
@@ -19,13 +19,12 @@ export const useLogin = () => {
   const { address } = useWallet();
   const [credentials, setCredentials] = useState<LoginCredentials>({
     walletAddress: address as `0x${string}`,
-    password: '',
+    password: "",
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  // Handle input changes
   const handleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     const { id, value } = e.target;
     setCredentials((prev) => ({
@@ -34,17 +33,14 @@ export const useLogin = () => {
     }));
   };
 
-  // Set token to cookie
   const setTokenCookie = (token: string) => {
-    // Set cookie to expire in 1 hour (same as token expiration)
-    Cookies.set('token', token, { 
-      expires: 1/24, // 1 hour
+    Cookies.set("token", token, {
+      expires: 1 / 24,
       secure: true,
-      sameSite: 'strict'
+      sameSite: "strict",
     });
   };
 
-  // Submit login
   const login = async (): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
@@ -61,20 +57,19 @@ export const useLogin = () => {
             ...credentials,
             walletAddress: address as `0x${string}`,
           }),
-        }
+        },
       );
 
       const data: LoginResponse = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || 'Login failed');
+        throw new Error(data.message || "Login failed");
       }
 
-      // Store token in cookie
       if (data.token) {
         setTokenCookie(data.token);
       }
-      
+
       setIsAuthenticated(true);
       return true;
     } catch (err) {

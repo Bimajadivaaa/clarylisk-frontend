@@ -13,10 +13,11 @@ export function useGetHistorySaweran(contractAddress: string) {
     abi: CREATOR_HUB_ABI,
     functionName: "getHistorySaweran",
     args: [],
-    enabled: !!contractAddress && contractAddress !== '0x0000000000000000000000000000000000000000',
+    query: {
+      enabled: !!contractAddress && contractAddress !== '0x0000000000000000000000000000000000000000',
+    },
   });
 
-  // Normalisasi hasil agar konsisten
   const donations = Array.isArray(data) ? data : [];
 
   return {

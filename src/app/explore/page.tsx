@@ -18,11 +18,9 @@ export default function ExplorePage() {
   const { creators, total, isLoading, error, refreshCreators } = useGetCreator();
   const [filteredCreators, setFilteredCreators] = useState(creators);
 
-  // Filter and sort creators based on search and sort criteria
   useEffect(() => {
     let result = [...creators];
     
-    // Apply search filter
     if (searchTerm) {
       result = result.filter(creator => 
         creator.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -30,9 +28,8 @@ export default function ExplorePage() {
       );
     }
     
-    // Apply sorting
     if (sort === 'popular') {
-      result = result.sort((a, b) => b.idUser - a.idUser); // Using idUser as a proxy for popularity
+      result = result.sort((a, b) => b.idUser - a.idUser);
     } else if (sort === 'newest') {
       result = result.sort((a, b) => b.idUser - a.idUser);
     }
@@ -40,11 +37,9 @@ export default function ExplorePage() {
     setFilteredCreators(result);
   }, [searchTerm, sort, creators]);
 
-  // Handle error state
   useEffect(() => {
     if (error) {
       console.error('Error fetching creators:', error);
-      // You might want to redirect to login if token is invalid
       if (error.includes('No authentication token found')) {
         router.push('/login');
       }
@@ -53,13 +48,11 @@ export default function ExplorePage() {
 
   return (
     <main className="min-h-screen bg-black pb-20 pt-24 px-4 sm:px-6 lg:px-8 relative">
-      {/* Background effects */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 -left-40 w-96 h-96 bg-purple-600/10 rounded-full filter blur-3xl" />
         <div className="absolute bottom-0 -right-40 w-96 h-96 bg-blue-600/10 rounded-full filter blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0,rgba(0,0,0,0)_70%)]" />
         
-        {/* Grid pattern */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
       </div>
 
@@ -73,7 +66,6 @@ export default function ExplorePage() {
           setSort={setSort}
         />
 
-        {/* Main content with tabs */}
         <Tabs defaultValue="grid" className="w-full">
           <div className="flex justify-between items-center mb-6">
             <div className="text-white text-sm">
@@ -81,7 +73,6 @@ export default function ExplorePage() {
             </div>
           </div>
 
-          {/* Grid View */}
           <TabsContent value="grid" className="mt-0">
             {isLoading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">

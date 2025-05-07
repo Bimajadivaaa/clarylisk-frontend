@@ -5,32 +5,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableRow,
-  TableHead,
-  TableCell,
-} from "@/components/ui/table";
 import {
   Search,
   Loader2,
   ArrowUpRight,
   AlertCircle,
   ArrowDown,
-  ArrowUp,
   Flame,
-  Clock,
-  BarChart3,
   Check,
 } from "lucide-react";
 import { useCreatorDonationHistory } from "@/hooks/smart-contract/read/useGetHistoryDonationTracker";
@@ -48,14 +33,12 @@ import IDRXLogo from "../../../public/img/IDRXLogo.jpg";
 import Image from "next/image";
 
 export default function SearchPage() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const walletParam = searchParams.get("wallet");
 
   const [inputValue, setInputValue] = useState(walletParam || "");
   const [searchQuery, setSearchQuery] = useState(walletParam || "");
   const [isSearching, setIsSearching] = useState(false);
-  const [selectedTab, setSelectedTab] = useState("overview");
   const [sortConfig, setSortConfig] = useState({
     key: "timestamp",
     direction: "desc" as "asc" | "desc",
@@ -70,7 +53,6 @@ export default function SearchPage() {
     error: onchainError,
   } = useCreatorDonationHistory(searchQuery);
 
-  // Risk detection cache and state
   const [riskMap, setRiskMap] = useState<
     Record<
       string,
@@ -79,7 +61,6 @@ export default function SearchPage() {
   >({});
   const { checkRisk } = useGetRiskMessage();
 
-  // Batch check risk for all unique notes after donations loaded
   useEffect(() => {
     const uniqueNotes = Array.from(
       new Set(onchainDonations.map((d) => d.note).filter(Boolean)),
@@ -89,7 +70,7 @@ export default function SearchPage() {
         setRiskMap((prev) => ({
           ...prev,
           [note]: { isRisk: null, isLoading: true, isError: false },
-        }));
+        }));  
         Promise.resolve(checkRisk(note))
           .then((res: any) => {
             setRiskMap((prev) => ({
@@ -112,13 +93,11 @@ export default function SearchPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onchainDonations]);
 
-  // Handle search submission
   const handleSearch = () => {
     if (!inputValue) return;
     setSearchQuery(inputValue);
   };
 
-  // Handle sort for transaction table
   const requestSort = (key: string) => {
     let direction: "asc" | "desc" = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
@@ -127,26 +106,6 @@ export default function SearchPage() {
     setSortConfig({ key, direction });
   };
 
-  // Format date for display
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  // Format wallet address for display
-  const formatWalletAddress = (address: string) => {
-    if (!address) return "";
-    if (address.includes("...")) return address; // Already formatted
-    return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-  };
-
-  // Group data by date
   const analyticsData = (() => {
     const map: Record<
       string,
@@ -167,7 +126,6 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black pt-[8rem]">
       <div className="max-w-6xl mx-auto space-y-8">
-        {/* Search Header */}
         <div className="space-y-4">
           <h1 className="text-3xl font-bold text-white">Donation Tracker</h1>
           <p className="text-gray-400">
@@ -214,10 +172,8 @@ export default function SearchPage() {
           </div>
         )}
 
-        {/* Wallet Data Display */}
         {searchQuery && (
           <div className="space-y-6">
-            {/* HEADER */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
@@ -245,7 +201,6 @@ export default function SearchPage() {
                 <ArrowUpRight className="ml-1 h-4 w-4" />
               </Button>
             </div>
-            {/* STAT CARDS */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card className="bg-gray-900/80 border-0 shadow-none">
                 <CardContent className="pt-6 flex items-center justify-between">
@@ -305,7 +260,6 @@ export default function SearchPage() {
                 </CardContent>
               </Card>
             </div>
-            {/* TABS */}
             <div className="mt-8">
               <div className="flex gap-4 border-b border-gray-800 mb-4">
                 <button
@@ -327,7 +281,6 @@ export default function SearchPage() {
                   Analytics
                 </button>
               </div>
-              {/* RECENT ACTIVITY */}
               {activeTab === "overview" && (
                 <div>
                   <h3 className="text-lg font-medium text-white mb-4">
@@ -399,7 +352,6 @@ export default function SearchPage() {
                       ))}
                     </div>
                   )}
-                  {/* Analytics chart di bawah activity */}
                   <div className="bg-gray-900/80 rounded-lg p-6 mt-10">
                     <h3 className="text-lg font-medium text-white mb-10">
                       Donation Analytics
@@ -461,7 +413,6 @@ export default function SearchPage() {
                               className="border-b border-gray-800 hover:bg-gray-800/50"
                             >
                               <td className="px-4 py-2">
-                                {/* Risk detection type */}
                                 {d.note ? (
                                   riskMap[d.note]?.isLoading ? (
                                     <span className="text-gray-400">

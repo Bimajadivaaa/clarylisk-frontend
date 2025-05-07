@@ -9,7 +9,6 @@ export function useGetContractBalance(contractAddress: string) {
     args: [],
   });
 
-  // data: [approved, pending, discard]
   let approved = 0, pending = 0, discard = 0;
   if (Array.isArray(data) && data.length === 3) {
     approved = Number(data[0]);

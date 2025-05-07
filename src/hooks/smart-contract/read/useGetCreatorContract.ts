@@ -2,13 +2,7 @@ import { CREATOR_HUB_FACTORY, CREATOR_HUB_FACTORY_ABI } from "@/config/const";
 import { useReadContract } from "wagmi";
 
 export const useGetCreatorContract = (creatorAddress: string) => {
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    refetch,
-  } = useReadContract({
+  const { data, isLoading, isError, error, refetch } = useReadContract({
     address: CREATOR_HUB_FACTORY,
     abi: CREATOR_HUB_FACTORY_ABI,
     functionName: "getCreatorContract",

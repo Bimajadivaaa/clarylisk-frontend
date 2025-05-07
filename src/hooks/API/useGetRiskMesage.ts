@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Cookies from "js-cookie";
-const API_URL = `${process.env.NEXT_PUBLIC_CLARYLISK_BACKEND || ''}/custom-api/ai/ai-clarylisk`;
+const API_URL = `${process.env.NEXT_PUBLIC_CLARYLISK_BACKEND || ""}/custom-api/ai/ai-clarylisk`;
 
 export const useGetRiskMessage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -8,8 +8,7 @@ export const useGetRiskMessage = () => {
   const [isRisk, setIsRisk] = useState<boolean | null>(null);
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const token = Cookies.get('token');
-  // console.log('token', token);
+  const token = Cookies.get("token");
   const checkRisk = async (text: string) => {
     setIsLoading(true);
     setIsError(false);
@@ -20,9 +19,9 @@ export const useGetRiskMessage = () => {
       const res = await fetch(API_URL, {
         method: "POST",
         headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ text }),
       });
       const result = await res.json();

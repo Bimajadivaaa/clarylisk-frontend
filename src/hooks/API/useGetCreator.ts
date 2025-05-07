@@ -1,9 +1,6 @@
 // hooks/useGetCreator.ts
-import { CLARYLISK_BACKEND } from '@/config/const';
-import { useState, useEffect } from 'react';
-import Cookies from 'js-cookie';
-
-// Define types for the creator data structure based on the API response
+import { CLARYLISK_BACKEND } from "@/config/const";
+import { useState, useEffect } from "react";
 interface Wallet {
   walletAdress: string;
 }
@@ -41,30 +38,23 @@ export const useGetCreator = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch creators list
   const fetchCreators = async (): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // const token = Cookies.get('token');
-      // if (!token) {
-      //   throw new Error('No authentication token found');
-      // }
-
       const response = await fetch(`${CLARYLISK_BACKEND}/custom-api/creators`, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
-          // 'Authorization': `Bearer ${token}`
+          "Content-Type": "application/json",
         },
       });
 
       const data: CreatorsResponse = await response.json();
-      console.log('data', data);
+      console.log("data", data);
 
       if (!response.ok) {
-        throw new Error('Failed to fetch creators');
+        throw new Error("Failed to fetch creators");
       }
 
       setCreators(data.data);
@@ -79,12 +69,10 @@ export const useGetCreator = () => {
     }
   };
 
-  // Fetch creators on component mount
   useEffect(() => {
     fetchCreators();
   }, []);
 
-  // Refresh creators list (useful when you need to update the list)
   const refreshCreators = () => {
     return fetchCreators();
   };

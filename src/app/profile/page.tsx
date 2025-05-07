@@ -36,19 +36,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRegisterCreatorContract } from "@/hooks/smart-contract/write/useRegisterCreatorContract";
 import { useGetCreatorContract } from "@/hooks/smart-contract/read/useGetCreatorContract";
-import { useGetDonationHistory } from "@/hooks/smart-contract/read/useGetDonationHistory";
 import { useGetHistorySaweran } from "@/hooks/smart-contract/read/useGetHistorySaweran";
 import { useApproveSaweran } from "@/hooks/smart-contract/write/useApproveSaweran";
 import { useBurnSaweran } from "@/hooks/smart-contract/write/useBurnSaweran";
 import { useGetContractBalance } from "@/hooks/smart-contract/read/useGetContractBalance";
 import IDRXLogo from "../../../public/img/IDRXLogo.jpg";
 
-// Fungsi konversi amount ke IDRX
 function formatIDRX(value: string | number) {
   return Number(value).toLocaleString("en-US");
 }
 
-// Shorten address utility
 const shortAddress = (addr: string) =>
   addr ? `${addr.substring(0, 6)}...${addr.slice(-4)}` : "";
 
@@ -58,7 +55,6 @@ export default function ProfilePage() {
   const [refreshing, setRefreshing] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
 
-  // Smart contract register hook
   const {
     registerCreator,
     isLoading: isRegisterLoading,
@@ -69,7 +65,6 @@ export default function ProfilePage() {
     reset: resetRegister,
   } = useRegisterCreatorContract();
 
-  // Get wallet address from the profile data
   const getWalletAddress = () => {
     if (profile?.walletAddress) {
       return profile.walletAddress;
@@ -80,7 +75,6 @@ export default function ProfilePage() {
     return "";
   };
 
-  // Get creator contract address
   const walletAddress = getWalletAddress();
   const {
     contractAddress,
@@ -90,7 +84,6 @@ export default function ProfilePage() {
     refetch: refetchContract,
   } = useGetCreatorContract(walletAddress);
 
-  // Donation history (from blockchain)
   const {
     donations,
     isLoading: isHistoryLoading,
@@ -99,15 +92,12 @@ export default function ProfilePage() {
     refetch: refetchHistory,
   } = useGetHistorySaweran(contractAddress || "");
 
-  // Approve & Burn hooks
   const {
     approveSaweran,
     isLoading: isApproveLoading,
     isSuccess: isApproveSuccess,
     isError: isApproveError,
     error: approveError,
-    hash: approveHash,
-    reset: resetApprove,
   } = useApproveSaweran(contractAddress || "");
   const {
     burnSaweran,
@@ -115,11 +105,8 @@ export default function ProfilePage() {
     isSuccess: isBurnSuccess,
     isError: isBurnError,
     error: burnError,
-    hash: burnHash,
-    reset: resetBurn,
   } = useBurnSaweran(contractAddress || "");
 
-  // Get contract balances
   const {
     approved: contractApproved,
     pending: contractPending,
@@ -130,14 +117,12 @@ export default function ProfilePage() {
     refetch: refetchBalance,
   } = useGetContractBalance(contractAddress || "");
 
-  // Copy wallet address to clipboard
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Copy contract address state
   const [copiedContract, setCopiedContract] = useState(false);
   const handleCopyContract = () => {
     if (contractAddress) {
@@ -147,7 +132,6 @@ export default function ProfilePage() {
     }
   };
 
-  // Handle refresh profile
   const handleRefresh = async () => {
     setRefreshing(true);
     setShowLoader(true);
@@ -156,7 +140,6 @@ export default function ProfilePage() {
     setShowLoader(false);
   };
 
-  // Get first letters of username for avatar fallback
   const getInitials = (name: string) => {
     if (!name) return "CL";
     return name
@@ -167,12 +150,10 @@ export default function ProfilePage() {
       .substring(0, 2);
   };
 
-  // State untuk filter dan search donation history
   const [donationStatus, setDonationStatus] = useState("all");
   const [donationSearch, setDonationSearch] = useState("");
-  const [donationSort, setDonationSort] = useState("desc"); // desc: terbaru, asc: terlama
+  const [donationSort, setDonationSort] = useState("desc");
 
-  // Filter, search, dan sort donations
   const filteredDonations = useMemo(() => {
     let result = [...donations];
     if (donationStatus !== "all") {
@@ -190,7 +171,6 @@ export default function ProfilePage() {
     return result;
   }, [donations, donationStatus, donationSearch, donationSort]);
 
-  // Loading state with skeletons
   if (isLoading || refreshing) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-6 flex items-center justify-center">
@@ -203,13 +183,11 @@ export default function ProfilePage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-8">
-            {/* Wallet Address Skeleton */}
             <div className="space-y-2">
               <Skeleton className="h-4 w-32 bg-gray-800/50" />
               <Skeleton className="h-12 w-full rounded-md bg-gray-800/50" />
             </div>
             
-            {/* Description Skeleton */}
             <div className="space-y-2">
               <Skeleton className="h-4 w-32 bg-gray-800/50" />
               <div className="space-y-2">
@@ -219,7 +197,6 @@ export default function ProfilePage() {
               </div>
             </div>
             
-            {/* Social Media Skeleton */}
             <div className="space-y-2">
               <Skeleton className="h-4 w-32 bg-gray-800/50" />
               <div className="flex space-x-2">
@@ -230,12 +207,10 @@ export default function ProfilePage() {
               </div>
             </div>
             
-            {/* Action Buttons Skeleton */}
             <div className="flex justify-between pt-2">
               <Skeleton className="h-8 w-24 bg-gray-800/50" />
               <Skeleton className="h-8 w-40 bg-gray-800/50" />
             </div>
-            {/* Blockchain Register Skeleton */}
             <div className="flex justify-center pt-4">
               <Skeleton className="h-10 w-56 bg-gray-800/50" />
             </div>
@@ -245,7 +220,6 @@ export default function ProfilePage() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-6 flex items-center justify-center">
@@ -271,7 +245,6 @@ export default function ProfilePage() {
     );
   }
 
-  // No data state - keeping this for backup
   if (!profile) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black p-6 flex items-center justify-center">
@@ -311,15 +284,13 @@ export default function ProfilePage() {
     );
   }
 
-  // Get profile image source - handling the nested structure from the API
   const getProfileImage = () => {
     if (profile?.image && profile.image.length > 0 && profile.image[0].image) {
       return profile.image[0].image;
     }
-    return "/1.png"; // Default image
+    return "/1.png";
   };
 
-  // Truncate wallet address for display
   const truncateAddress = (address: string) => {
     if (!address || address.length < 10) return address || "-";
     return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
@@ -363,7 +334,6 @@ export default function ProfilePage() {
         </CardHeader>
         
         <CardContent className="space-y-6">
-          {/* Wallet Address */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-300">
@@ -392,7 +362,6 @@ export default function ProfilePage() {
             </div>
           </div>
           
-          {/* Description */}
           {profile?.description && (
             <div className="space-y-2">
               <h3 className="text-sm font-medium text-gray-300">About</h3>
@@ -402,7 +371,6 @@ export default function ProfilePage() {
             </div>
           )}
           
-          {/* Social Media */}
           <div className="space-y-2">
             <h3 className="text-sm font-medium text-gray-300">Social Media</h3>
             <div className="flex flex-wrap gap-2">
@@ -519,7 +487,6 @@ export default function ProfilePage() {
           
           <Separator className="bg-gray-800" />
           
-          {/* Action Buttons */}
           <div className="flex justify-between pt-2">
             <Button 
               variant="outline" 
@@ -536,9 +503,8 @@ export default function ProfilePage() {
               Refresh
             </Button>
           </div>
-          {/* Blockchain Register Button & Status */}
+          
           <div className="flex flex-col items-start gap-2 pt-4">
-            {/* Show contract info if exists, else show register button */}
             {contractAddress &&
             contractAddress !== "0x0000000000000000000000000000000000000000" ? (
               <>
@@ -556,7 +522,6 @@ export default function ProfilePage() {
                     <span className="text-xs text-gray-500 select-none">{copiedContract ? "Copied!" : ""}</span>
                   </div>
                 </div>
-                {/* Contract Balances - Redesigned */}
                 <div className="mt-4 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="rounded-lg bg-gradient-to-br from-green-900/40 to-green-800/10 border border-green-700 p-3 sm:p-4 flex flex-col items-center shadow">
                     <span className="text-xs sm:text-xs text-green-300 font-semibold mb-1">Approved</span>
@@ -574,13 +539,11 @@ export default function ProfilePage() {
                 {isBalanceError && (
                   <div className="text-red-400 text-xs mb-2">Failed to load balance</div>
                 )}
-                {/* Donation History */}
                 <Separator className="bg-gray-800 my-4" />
                 <div className="mt-4">
                   <h3 className="text-sm font-medium text-gray-300 mb-2">
                     Creator Donation History
                   </h3>
-                  {/* Filter & Search Bar */}
                   <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-4 overflow-x-auto">
                     <div className="flex gap-1 flex-wrap">
                       <button onClick={() => setDonationStatus("all")} className={`px-3 py-1 rounded text-xs font-semibold border ${donationStatus === "all" ? "bg-primary text-white border-primary" : "bg-gray-900 text-gray-400 border-gray-700 hover:bg-gray-800"}`}>All</button>
@@ -657,7 +620,6 @@ export default function ProfilePage() {
                                   : "Pending"}
                             </span>
                           </div>
-                          {/* Tombol aksi jika pending */}
                           {!(donation.approved || donation.discarded) && (
                             <div className="flex flex-col sm:flex-row gap-2 mt-2 sticky bottom-0 z-10">
                               <Button

@@ -2,7 +2,6 @@
 import { useState, ChangeEvent } from "react";
 import { CLARYLISK_BACKEND } from "@/config/const";
 import { useWallet } from "@/hooks/useWallet";
-// Define interfaces for our form data and API data
 interface FormData {
   username: string;
   password: string;
@@ -39,7 +38,6 @@ interface RegisterResponse {
 }
 
 export const useRegister = () => {
-  // Form state
   const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
@@ -63,20 +61,16 @@ export const useRegister = () => {
     "https://ipfs.io/ipfs/bafybeigqxsv4tlgr2rnezz5dwndyztvrtxjjn3ergatvu5udf6yng4f7he/6.png",
   ];
 
-  // Form step state (0: account, 1: profile, 2: social)
   const [formStep, setFormStep] = useState<number>(0);
 
-  // Loading and error states
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
 
-  // Validation states
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
     {},
   );
 
-  // Handle input changes
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ): void => {
@@ -86,7 +80,6 @@ export const useRegister = () => {
       [id]: value,
     }));
 
-    // Clear validation errors when user types
     if (validationErrors[id]) {
       setValidationErrors((prev) => ({
         ...prev,
@@ -95,18 +88,15 @@ export const useRegister = () => {
     }
   };
 
-  // Get random image from imageProfile array
   const getRandomImage = (): string => {
     const randomIndex = Math.floor(Math.random() * imageProfile.length);
     return imageProfile[randomIndex];
   };
 
-  // Validate the current step
   const validateStep = (): boolean => {
     const errors: ValidationErrors = {};
 
     if (formStep === 0) {
-      // Account step validation
       if (!formData.username.trim()) {
         errors.username = "Username is required";
       }
@@ -121,7 +111,6 @@ export const useRegister = () => {
         errors.confirmPassword = "Passwords do not match";
       }
     } else if (formStep === 1) {
-      // Profile step validation
       if (!formData.description.trim()) {
         errors.description = "Description is required";
       }
@@ -131,7 +120,6 @@ export const useRegister = () => {
     return Object.keys(errors).length === 0;
   };
 
-  // Navigation between steps
   const nextStep = (): void => {
     if (validateStep()) {
       setFormStep((prev) => prev + 1);
@@ -142,7 +130,6 @@ export const useRegister = () => {
     setFormStep((prev) => prev - 1);
   };
 
-  // Submit form to API
   const submitRegistration = async (): Promise<RegisterResponse | null> => {
     if (!validateStep()) {
       return null;
@@ -152,7 +139,6 @@ export const useRegister = () => {
     setError(null);
 
     try {
-      // Prepare data for API
       const apiData: ApiData = {
         username: formData.username,
         password: formData.password,

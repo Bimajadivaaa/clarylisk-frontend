@@ -34,7 +34,6 @@ export const useRegisterCreatorContract = (): RegisterCreatorResult => {
     hash: hash || undefined,
   });
 
-  // Function to register a creator with username and description
   const registerCreator = () => {
     writeContract(
       {
@@ -50,13 +49,11 @@ export const useRegisterCreatorContract = (): RegisterCreatorResult => {
     );
   };
 
-  // Reset function to clear state
   const reset = () => {
     setHash(null);
     resetWrite();
   };
 
-  // Combine states from both hooks for simpler external usage
   const isLoading = isWritePending || isWaitLoading;
   const isSuccess = isWriteSuccess && isWaitSuccess;
   const isError = isWriteError || isWaitError;

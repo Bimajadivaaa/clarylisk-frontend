@@ -35,13 +35,11 @@ export default function LoginPage() {
 
   return (
     <main className="min-h-screen bg-black py-8 px-4 flex items-center justify-center">
-      {/* Background effects - more subtle */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-0 -left-40 w-96 h-96 bg-purple-600/10 rounded-full filter blur-3xl" />
         <div className="absolute bottom-0 -right-40 w-96 h-96 bg-blue-600/10 rounded-full filter blur-3xl" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.05)_0,rgba(0,0,0,0)_70%)]" />
         
-        {/* Grid pattern - more subtle */}
         <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] opacity-20" />
       </div>
 
@@ -93,9 +91,6 @@ export default function LoginPage() {
                   <Label htmlFor="password" className="text-white text-sm">
                     Password
                   </Label>
-                  {/* <Link href="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300">
-                    Forgot password?
-                  </Link> */}
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />

@@ -8,12 +8,6 @@ import Link from 'next/link';
 import { Menu, X, User, Wallet} from 'lucide-react';
 import CustomConnectButton from '@/components/connect-wallet/custom-connect-wallet';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import logo from "../../public/img/newlogo.png";
 import { usePathname } from 'next/navigation';
 
@@ -32,7 +26,6 @@ export default function Header() {
     link => !(link.name === 'Profile' && (pathname === '/' || pathname === '/register' || pathname === '/login'))
   );
 
-  // Change header style on scroll
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 10) {
@@ -56,7 +49,6 @@ export default function Header() {
     >
       <div className="container px-4 mx-auto">
         <div className="flex items-center justify-between">
-          {/* Logo */}
           <Link href="/" className="flex items-center">
             <div className="relative w-20 h-10">
               <div className="absolute inset-0 " />
@@ -67,7 +59,6 @@ export default function Header() {
             <span className="text-2xl font-bold text-white">Clarylisk</span>
           </Link>
 
-          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
             {filteredNavLinks.map((link) => (
               <Link
@@ -83,36 +74,10 @@ export default function Header() {
             ))}
           </nav>
 
-          {/* Actions */}
           <div className="hidden md:flex items-center space-x-3">
-            {/* Custom Connect Wallet Button */}
             <CustomConnectButton />
-
-            {/* Profile Dropdown
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" className="rounded-full border-white/20 text-white hover:bg-white/10">
-                  <User className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="bg-gray-800 border border-white/10 text-white">
-                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
-                  Profile
-                </DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
-                  Dashboard
-                </DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
-                  Settings
-                </DropdownMenuItem>
-                <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu> */}
           </div>
 
-          {/* Mobile Menu Button */}
           <div className="flex md:hidden items-center gap-2">
             <CustomConnectButton />
             <button
@@ -129,7 +94,6 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       {isMobileMenuOpen && (
         <div className="fixed inset-0 top-16 bg-gray-900/95 backdrop-blur-lg md:hidden z-40 p-4">
           <div className="flex flex-col h-full">

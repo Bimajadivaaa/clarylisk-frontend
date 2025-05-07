@@ -5,10 +5,10 @@ const DOMAIN = 'next-dapp-matteocelani.vercel.app';
 const siteConfig = {
   title: 'Clarylisk',
   description:
-    'Next.js dApp template with Tailwind CSS and RainbowKit built in TypeScript.',
+    'Clarylisk is a platform for creating and managing creator profiles on the Ethereum blockchain.',
   keywords:
-    'React, Next.js, Tailwind CSS, Sass, RainbowKit, Solidity, Hardhat, ethers.js, Blockchain, TypeScript',
-  author: 'Matteo Celani',
+    'Clarylisk, Ethereum, Blockchain, Creator Profiles, Donations, Transactions',
+  author: 'Clarylisk',
   url: DOMAIN,
   image: `${DOMAIN}/img/logo.png`,
 } as const;
