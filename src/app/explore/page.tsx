@@ -1,22 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { CREATORS } from '@/lib/data/creator';
+import { useRouter } from 'next/navigation';
 import CreatorGridView from '@/components/explore/creator-grid-view';
-import CreatorListView from '@/components/explore/creator-list-view';
 import ExploreFilters from '@/components/explore/explore-filter';
 import ExploreHeader from '@/components/explore/explore-header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useGetCreator } from '@/hooks/API/useGetCreator';
+import { Skeleton } from '@/components/ui/skeleton';
+import Image from 'next/image';
+import IDRXLogo from "../../../public/img/IDRXLogo.jpg";
 
 export default function ExplorePage() {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
-  const [category, setCategory] = useState('all');
   const [sort, setSort] = useState('popular');
-  const [filteredCreators, setFilteredCreators] = useState(CREATORS);
+  const { creators, total, isLoading, error, refreshCreators } = useGetCreator();
+  const [filteredCreators, setFilteredCreators] = useState(creators);
 
-  // Filter and sort creators based on search, category, and sort criteria
+  // Filter and sort creators based on search and sort criteria
   useEffect(() => {
-    let result = [...CREATORS];
+    let result = [...creators];
     
     // Apply search filter
     if (searchTerm) {
@@ -26,23 +30,26 @@ export default function ExplorePage() {
       );
     }
     
-    // Apply category filter
-    if (category !== 'all') {
-      result = result.filter(creator => creator.category === category);
-    }
-    
     // Apply sorting
     if (sort === 'popular') {
-      result = result.sort((a, b) => b.followers - a.followers);
-    } else if (sort === 'donations') {
-      result = result.sort((a, b) => b.donationsReceived - a.donationsReceived);
+      result = result.sort((a, b) => b.idUser - a.idUser); // Using idUser as a proxy for popularity
     } else if (sort === 'newest') {
-      // In a real app, you'd sort by creation date
-      result = result.sort((a, b) => parseInt(b.id) - parseInt(a.id));
+      result = result.sort((a, b) => b.idUser - a.idUser);
     }
     
     setFilteredCreators(result);
-  }, [searchTerm, category, sort]);
+  }, [searchTerm, sort, creators]);
+
+  // Handle error state
+  useEffect(() => {
+    if (error) {
+      console.error('Error fetching creators:', error);
+      // You might want to redirect to login if token is invalid
+      if (error.includes('No authentication token found')) {
+        router.push('/login');
+      }
+    }
+  }, [error, router]);
 
   return (
     <main className="min-h-screen bg-black pb-20 pt-24 px-4 sm:px-6 lg:px-8 relative">
@@ -62,8 +69,6 @@ export default function ExplorePage() {
         <ExploreFilters 
           searchTerm={searchTerm} 
           setSearchTerm={setSearchTerm}
-          category={category}
-          setCategory={setCategory}
           sort={sort}
           setSort={setSort}
         />
@@ -72,26 +77,36 @@ export default function ExplorePage() {
         <Tabs defaultValue="grid" className="w-full">
           <div className="flex justify-between items-center mb-6">
             <div className="text-white text-sm">
-              {filteredCreators.length} creators found
+              Find your favorite creators! to support them with <span className="font-bold text-blue-700">$IDRX</span> <Image src={IDRXLogo} alt="IDRX" width={15} height={15} className="inline-block rounded-full mb-1" />
             </div>
-            <TabsList className="bg-gray-800/50">
-              <TabsTrigger value="grid" className="data-[state=active]:bg-gray-700 data-[state=active]:text-white">
-                Grid View
-              </TabsTrigger>
-              <TabsTrigger value="list" className="data-[state=active]:bg-gray-700 data-[state=active]:text-white">
-                List View
-              </TabsTrigger>
-            </TabsList>
           </div>
 
           {/* Grid View */}
           <TabsContent value="grid" className="mt-0">
-            <CreatorGridView creators={filteredCreators} />
-          </TabsContent>
-
-          {/* List View */}
-          <TabsContent value="list" className="mt-0">
-            <CreatorListView creators={filteredCreators} />
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {[...Array(8)].map((_, index) => (
+                  <div key={index} className="bg-black/60 border border-gray-800 rounded-lg overflow-hidden backdrop-blur-sm">
+                    <div className="p-4">
+                      <div className="flex items-center space-x-4 mb-4">
+                        <Skeleton className="h-12 w-12 rounded-full bg-gray-800/50" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-24 bg-gray-800/50" />
+                          <Skeleton className="h-3 w-16 bg-gray-800/50" />
+                        </div>
+                      </div>
+                      <Skeleton className="h-20 w-full rounded-md bg-gray-800/50 mb-4" />
+                      <div className="flex justify-between">
+                        <Skeleton className="h-8 w-20 bg-gray-800/50" />
+                        <Skeleton className="h-8 w-8 rounded-full bg-gray-800/50" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <CreatorGridView creators={filteredCreators as any} />
+            )}
           </TabsContent>
         </Tabs>
       </div>

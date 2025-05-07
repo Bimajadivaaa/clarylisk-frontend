@@ -95,13 +95,6 @@ export default function Stats() {
             </Card>
           ))}
         </div>
-        
-        <div className="mt-16 text-center">
-          <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">
-            <span className='text-black'>View Blockchain Explorer</span>
-            <ExternalLink className="ml-2 w-4 h-4 text-black" />
-          </Button>
-        </div>
       </div>
     </main>
   );

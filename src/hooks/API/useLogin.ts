@@ -1,5 +1,8 @@
 // hooks/useLogin.ts
+import { CLARYLISK_BACKEND } from '@/config/const';
 import { useState, ChangeEvent } from 'react';
+import { useWallet } from '../useWallet';
+import Cookies from 'js-cookie';
 
 interface LoginCredentials {
   walletAddress: string;
@@ -13,8 +16,9 @@ interface LoginResponse {
 }
 
 export const useLogin = () => {
+  const { address } = useWallet();
   const [credentials, setCredentials] = useState<LoginCredentials>({
-    walletAddress: '',
+    walletAddress: address as `0x${string}`,
     password: '',
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -30,19 +34,35 @@ export const useLogin = () => {
     }));
   };
 
+  // Set token to cookie
+  const setTokenCookie = (token: string) => {
+    // Set cookie to expire in 1 hour (same as token expiration)
+    Cookies.set('token', token, { 
+      expires: 1/24, // 1 hour
+      secure: true,
+      sameSite: 'strict'
+    });
+  };
+
   // Submit login
   const login = async (): Promise<boolean> => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('https://backend-clarylisk.vercel.app/user/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
+      const response = await fetch(
+        `${CLARYLISK_BACKEND}/custom-api/user/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...credentials,
+            walletAddress: address as `0x${string}`,
+          }),
+        }
+      );
 
       const data: LoginResponse = await response.json();
 
@@ -50,9 +70,9 @@ export const useLogin = () => {
         throw new Error(data.message || 'Login failed');
       }
 
-      // Store token in localStorage if needed
+      // Store token in cookie
       if (data.token) {
-        localStorage.setItem('token', data.token);
+        setTokenCookie(data.token);
       }
       
       setIsAuthenticated(true);

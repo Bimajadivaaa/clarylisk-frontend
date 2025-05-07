@@ -1,5 +1,7 @@
-// hooks/useCreators.ts
+// hooks/useGetCreator.ts
+import { CLARYLISK_BACKEND } from '@/config/const';
 import { useState, useEffect } from 'react';
+import Cookies from 'js-cookie';
 
 // Define types for the creator data structure based on the API response
 interface Wallet {
@@ -32,7 +34,8 @@ interface CreatorsResponse {
   data: Creator[];
 }
 
-export const useCreators = () => {
+export type { Creator };
+export const useGetCreator = () => {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [total, setTotal] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -44,14 +47,21 @@ export const useCreators = () => {
     setError(null);
 
     try {
-      const response = await fetch('https://backend-clarylisk.vercel.app/creators', {
+      // const token = Cookies.get('token');
+      // if (!token) {
+      //   throw new Error('No authentication token found');
+      // }
+
+      const response = await fetch(`${CLARYLISK_BACKEND}/custom-api/creators`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          // 'Authorization': `Bearer ${token}`
         },
       });
 
       const data: CreatorsResponse = await response.json();
+      console.log('data', data);
 
       if (!response.ok) {
         throw new Error('Failed to fetch creators');

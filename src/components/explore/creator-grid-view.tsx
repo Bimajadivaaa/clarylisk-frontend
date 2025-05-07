@@ -1,5 +1,5 @@
 /* eslint-disable no-restricted-imports */
-import { Creator } from '@/lib/data/creator';
+import { Creator } from '@/hooks/API/useGetCreator';
 import CreatorCard from './explore-card';
 
 interface CreatorGridViewProps {
@@ -9,8 +9,12 @@ interface CreatorGridViewProps {
 export default function CreatorGridView({ creators }: CreatorGridViewProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {creators.map((creator) => (
+      {/* {creators.map((creator) => (
         <CreatorCard key={creator.id} creator={creator} />
+      ))} */}
+
+      {creators.map((creator) => (
+        <CreatorCard key={creator.idUser} creator={creator} />
       ))}
       
       {/* Empty state if no creators found */}

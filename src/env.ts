@@ -17,6 +17,9 @@ export const env = createEnv({
     NEXT_PUBLIC_XELLAR_APP_ID: z.string().min(1),
     NEXT_PUBLIC_CLARYLISK_BACKEND: z.string().min(1),
     NEXT_PUBLIC_CLARYLISK_CONTRACT: z.string().min(1),
+    NEXT_PUBLIC_CREATOR_HUB_FACTORY: z.string().min(1),
+    // NEXT_PUBLIC_CREATOR_HUB_CONTRACT: z.string().min(1),
+    NEXT_PUBLIC_IDRX_CONTRACT: z.string().min(1),
   },
   /*
    * Due to how Next.js bundles environment variables on Edge and Client,
@@ -30,5 +33,8 @@ export const env = createEnv({
     NEXT_PUBLIC_XELLAR_APP_ID: process.env.NEXT_PUBLIC_XELLAR_APP_ID,
     NEXT_PUBLIC_CLARYLISK_BACKEND: process.env.NEXT_PUBLIC_CLARYLISK_BACKEND,
     NEXT_PUBLIC_CLARYLISK_CONTRACT: process.env.NEXT_PUBLIC_CLARYLISK_CONTRACT,
+    NEXT_PUBLIC_CREATOR_HUB_FACTORY: process.env.NEXT_PUBLIC_CREATOR_HUB_FACTORY,
+    // NEXT_PUBLIC_CREATOR_HUB_CONTRACT: process.env.NEXT_PUBLIC_CREATOR_HUB_CONTRACT,
+    NEXT_PUBLIC_IDRX_CONTRACT: process.env.NEXT_PUBLIC_IDRX_CONTRACT,
   },
 });

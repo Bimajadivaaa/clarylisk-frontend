@@ -28,9 +28,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useRegister } from "@/hooks/API/useRegister";
 import { useRouter } from "next/navigation";
+import { useWallet } from "@/hooks/useWallet";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const { address } = useWallet();
   const {
     formData,
     formStep,
@@ -39,35 +41,15 @@ export default function RegisterPage() {
     success,
     validationErrors,
     handleChange,
-    handleImageChange,
     nextStep,
     prevStep,
     submitRegistration,
     setFormStep,
   } = useRegister();
 
-  // Handle file upload for profile image
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        // Type assertion to string since we know it will be a string
-        handleImageChange(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   // Handle form submission
   const handleSubmit = async () => {
     const result = await submitRegistration();
-    if (result) {
-      // Registration successful, redirect after a short delay
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
-    }
   };
 
   return (
@@ -98,10 +80,9 @@ export default function RegisterPage() {
         {/* Success Message */}
         {success && (
           <div className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-md text-white">
-            Registration successful! Redirecting to login page...
+            Registration successful!
           </div>
         )}
-
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-md text-white">
@@ -264,8 +245,9 @@ export default function RegisterPage() {
                         id="walletAddress"
                         placeholder="Your ETH wallet address"
                         className={`pl-10 bg-gray-800/50 border-white/10 text-white ${validationErrors.walletAddress ? "border-red-500" : ""}`}
-                        value={formData.walletAddress}
                         onChange={handleChange}
+                        value={address}
+                        disabled
                       />
                     </div>
                     {validationErrors.walletAddress && (
@@ -275,102 +257,21 @@ export default function RegisterPage() {
                     )}
                   </div>
 
-                  {/* Enhanced Image Upload Component */}
-                  <div className="grid gap-3">
-                    <Label htmlFor="image" className="text-white">
-                      Profile Image
-                    </Label>
-
-                    <div className="relative">
-                      {formData.image ? (
-                        <div className="mb-3 flex items-center gap-4">
-                          <div className="h-24 w-24 rounded-full border-2 border-purple-500 overflow-hidden bg-gray-800 flex items-center justify-center">
-                            <img
-                              src={formData.image}
-                              alt="Profile preview"
-                              className="h-full w-full object-cover"
-                            />
-                          </div>
-                          <div className="flex flex-col gap-1">
-                            <p className="text-green-400 text-sm">
-                              Image uploaded successfully
-                            </p>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => handleImageChange("")}
-                              className="border-white/20 text-black hover:bg-gray-800 hover:text-white mt-1 w-32"
-                            >
-                              Remove Image
-                            </Button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="mb-3 flex items-center justify-center">
-                          <div className="h-24 w-24 rounded-full border-2 border-dashed border-white/30 flex items-center justify-center bg-gray-800/50">
-                            <User className="h-10 w-10 text-gray-400" />
-                          </div>
-                        </div>
-                      )}
-
-                      <label htmlFor="image-upload" className="cursor-pointer">
-                        <div className="flex items-center gap-2 p-4 border border-dashed border-white/30 rounded-md bg-gray-800/50 hover:bg-gray-800/80 transition-colors">
-                          <div className="bg-gray-700/50 rounded-full p-2">
-                            <svg
-                              width="20"
-                              height="20"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              className="text-purple-400"
-                            >
-                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                              <polyline points="17 8 12 3 7 8"></polyline>
-                              <line x1="12" y1="3" x2="12" y2="15"></line>
-                            </svg>
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-white">
-                              Upload your profile image
-                            </p>
-                            <p className="text-xs text-gray-400">
-                              Click to browse or drag and drop
-                            </p>
-                            <p className="text-xs text-gray-400 mt-1">
-                              JPG, PNG, GIF up to 5MB
-                            </p>
-                          </div>
-                        </div>
-                      </label>
-
-                      <Input
-                        id="image-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                      />
-                    </div>
+                  <div className="flex justify-between">
+                    <Button
+                      onClick={prevStep}
+                      variant="outline"
+                      className="border-white/20 text-black hover:bg-gray-800 hover:text-white"
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      onClick={nextStep}
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
+                    >
+                      Next Step
+                    </Button>
                   </div>
-                </div>
-
-                <div className="flex justify-between">
-                  <Button
-                    onClick={prevStep}
-                    variant="outline"
-                    className="border-white/20 text-black hover:bg-gray-800 hover:text-white"
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    onClick={nextStep}
-                    className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
-                  >
-                    Next Step
-                  </Button>
                 </div>
               </TabsContent>
 

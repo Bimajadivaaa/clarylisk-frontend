@@ -88,13 +88,13 @@ export default function Hero() {
             <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10">
               <Flame className="w-4 h-4 text-red-500" />
               <span className="text-white">
-                <span className="font-bold">9,847 ETH</span> burned
+                <span className="font-bold">1000,000 IDRX</span> burned
               </span>
             </div>
             <div className="flex items-center gap-2 px-4 py-1.5">
               <BarChart3 className="w-4 h-4 text-green-500" />
               <span className="text-white">
-                <span className="font-bold">5,243</span> donations tracked
+                <span className="font-bold">5,243</span> Creator Registered
               </span>
             </div>
           </div>

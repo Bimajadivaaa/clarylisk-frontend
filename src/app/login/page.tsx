@@ -2,24 +2,35 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { User, Lock, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useLogin } from '@/hooks/API/useLogin';
+import { useWallet } from '@/hooks/useWallet';
 
 export default function LoginPage() {
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { address } = useWallet();
+  const {
+    credentials,
+    isLoading,
+    error,
+    handleChange,
+    login,
+  } = useLogin();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    // Simulate login process
-    setTimeout(() => {
-      setIsLoading(false);
-      // Here you would normally redirect after successful login
-    }, 1500);
+    const success = await login();
+    if (success) {
+      router.push('/explore');
+    }
   };
 
   return (
@@ -46,6 +57,12 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {error && (
+          <div className="mb-4 p-4 bg-red-500/20 border border-red-500/50 rounded-md text-white">
+            {error}
+          </div>
+        )}
+
         <Card className="bg-gray-900/70 border border-gray-800 shadow-xl overflow-hidden">
           <CardHeader className="border-b border-gray-800 bg-gray-900/80 py-4">
             <CardTitle className="text-white text-lg">Login</CardTitle>
@@ -54,19 +71,19 @@ export default function LoginPage() {
             </CardDescription>
           </CardHeader>
 
-          <form onSubmit={handleLogin}>
+          <form onSubmit={handleSubmit}>
             <CardContent className="pt-6 pb-4 space-y-5">
               <div className="space-y-1.5">
-                <Label htmlFor="username" className="text-white text-sm">
-                  Username
+                <Label htmlFor="walletAddress" className="text-white text-sm">
+                  Wallet Address
                 </Label>
                 <div className="relative">
                   <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
                   <Input 
-                    id="username" 
-                    placeholder="Enter your username" 
+                    id="walletAddress" 
+                    value={address}
+                    disabled
                     className="pl-10 bg-gray-800/50 border-gray-700 text-white h-10"
-                    required
                   />
                 </div>
               </div>
@@ -76,26 +93,28 @@ export default function LoginPage() {
                   <Label htmlFor="password" className="text-white text-sm">
                     Password
                   </Label>
-                  <Link href="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300">
+                  {/* <Link href="/forgot-password" className="text-xs text-blue-400 hover:text-blue-300">
                     Forgot password?
-                  </Link>
+                  </Link> */}
                 </div>
                 <div className="relative">
                   <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-500" />
                   <Input 
                     id="password" 
-                    type="password" 
+                    type={showPassword ? "text" : "password"} 
                     placeholder="Enter your password" 
                     className="pl-10 bg-gray-800/50 border-gray-700 text-white h-10"
+                    value={credentials.password}
+                    onChange={handleChange}
                     required
                   />
                 </div>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Checkbox id="remember" className="border-gray-600 data-[state=checked]:bg-blue-600" />
-                <Label htmlFor="remember" className="text-gray-300 text-xs font-normal">
-                  Remember me for 30 days
+                <Checkbox id="show-password" className="border-gray-600 data-[state=checked]:bg-blue-600" checked={showPassword} onCheckedChange={checked => setShowPassword(checked === true)} />
+                <Label htmlFor="show-password" className="text-gray-300 text-xs font-normal">
+                  Show password
                 </Label>
               </div>
             </CardContent>

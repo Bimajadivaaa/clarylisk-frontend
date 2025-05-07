@@ -8,14 +8,11 @@ import { liskSepolia } from "viem/chains";
 
 const config = defaultConfig({
   appName: "Xellar",
-  // Required for WalletConnect
   walletConnectProjectId: 'fe575b36234dc9b54e34a40e332d7f92',
-
-  // Required for Xellar Passport
   xellarAppId: 'db10403c-8583-4708-a126-62a799d4f1f6',
   xellarEnv: "sandbox",
-  ssr: false, // Changed to false since we're not using Next.js App Router
-  chains: [liskSepolia], // Added chain configuration
+  ssr: false,
+  chains: [liskSepolia],
 }) as Config;
 
 const queryClient = new QueryClient();

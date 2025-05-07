@@ -4,8 +4,15 @@ import { ConnectButton } from "@xellar/kit";
 import { Button } from "@/components/ui/button";
 import liskLogo from "../../../public/img/liskLogo.png"
 import Image from "next/image";
+import { useLogout } from "@/hooks/API/useLogout";
+import { LogOut } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 export default function CustomConnectButton() {
+  const { logout } = useLogout();
+  const pathname = usePathname();
+  const isLoginPage = pathname === '/login' || pathname === '/register' || pathname === '/';
+
   return (
     <ConnectButton.Custom>
       {({
@@ -47,6 +54,17 @@ export default function CustomConnectButton() {
               {account?.address.slice(0, 6)}...
               {account?.address.slice(-4)}
             </Button>
+            {!isLoginPage && (
+              <Button
+                onClick={logout}
+                type="button"
+                variant="outline"
+                className="bg-red-600 text-white hover:bg-red-700 hover:text-white"
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            )}
           </div>
         );
       }}

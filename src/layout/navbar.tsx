@@ -15,18 +15,22 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import logo from "../../public/img/newlogo.png";
+import { usePathname } from 'next/navigation';
 
 const navLinks = [
   { name: 'Home', href: '/' },
-  { name: 'How It Works', href: '/how-it-works' },
   { name: 'Explore', href: '/explore' },
-  { name: 'For Creators', href: '/creators' },
-  { name: 'For Platforms', href: '/platforms' },
+  { name: 'Tracker', href: '/search' },
+  { name: 'Profile', href: '/profile' },
 ];
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const filteredNavLinks = navLinks.filter(
+    link => !(link.name === 'Profile' && (pathname === '/' || pathname === '/register' || pathname === '/login'))
+  );
 
   // Change header style on scroll
   useEffect(() => {
@@ -54,10 +58,10 @@ export default function Header() {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center">
-            <div className="relative w-10 h-10 mr-2">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 to-blue-600" />
-              <div className="absolute inset-0.5 rounded-full bg-black flex items-center justify-center">
-                <Image src={logo} alt='logo' width={200} height={100}/>
+            <div className="relative w-20 h-10">
+              <div className="absolute inset-0 " />
+              <div className="absolute inset-0.5 flex items-center justify-center">
+                <Image src={logo} alt='logo' width={100} height={100}/>
               </div>
             </div>
             <span className="text-2xl font-bold text-white">Clarylisk</span>
@@ -65,13 +69,14 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-1">
-            {navLinks.map((link) => (
+            {filteredNavLinks.map((link) => (
               <Link
                 key={link.name}
                 href={link.href}
-                className={`px-3 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors ${
-                  link.name === 'Explore' ? 'font-medium text-white' : ''
-                }`}
+                className={`px-3 py-2 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors
+                  ${pathname === link.href ? 'bg-white/10 text-white font-bold' : ''}
+                  ${link.name === 'Explore' ? 'font-medium text-white' : ''}
+                `}
               >
                 {link.name}
               </Link>
@@ -129,11 +134,13 @@ export default function Header() {
         <div className="fixed inset-0 top-16 bg-gray-900/95 backdrop-blur-lg md:hidden z-40 p-4">
           <div className="flex flex-col h-full">
             <nav className="flex flex-col space-y-2 mt-4">
-              {navLinks.map((link) => (
+              {filteredNavLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-colors"
+                  className={`px-4 py-3 rounded-lg text-white hover:bg-white/10 transition-colors
+                    ${pathname === link.href ? 'bg-white/10 text-white font-bold' : ''}
+                  `}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.name}

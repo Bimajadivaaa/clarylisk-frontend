@@ -28,13 +28,13 @@ export default function Cta() {
               </div>
               
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-                <Button 
+                {/* <Button 
                   size="lg" 
                   className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg w-full sm:w-auto"
                 >
                   <span>Connect Wallet</span>
                   <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
+                </Button> */}
                 <Button 
                   variant="outline" 
                   size="lg" 

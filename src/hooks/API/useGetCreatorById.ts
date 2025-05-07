@@ -1,6 +1,8 @@
 // hooks/useCreatorById.ts
+import { CLARYLISK_BACKEND } from '@/config/const';
 import { useState, useEffect } from 'react';
-
+import Cookies from 'js-cookie';
+import { useParams } from 'next/navigation';
 // Define types for the creator data structure
 interface Wallet {
   walletAdress: string;
@@ -38,18 +40,23 @@ export const useCreatorById = (creatorId: number | string) => {
     setError(null);
 
     try {
-      const response = await fetch(`https://backend-clarylisk.vercel.app/creators/${creatorId}`, {
+      const token = Cookies.get('token'); 
+      const response = await fetch(`${CLARYLISK_BACKEND}/custom-api/creators/${creatorId}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
       });
+
+      console.log('@useCreatorById creatorId', creatorId);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch creator with ID ${creatorId}`);
       }
 
       const data: Creator = await response.json();
+      console.log('creator', data);
       setCreator(data);
       return true;
     } catch (err) {
