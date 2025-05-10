@@ -31,7 +31,7 @@ import {
   User,
   Loader2,
 } from "lucide-react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useRegisterCreatorContract } from "@/hooks/smart-contract/write/useRegisterCreatorContract";
@@ -41,6 +41,8 @@ import { useApproveSaweran } from "@/hooks/smart-contract/write/useApproveSawera
 import { useBurnSaweran } from "@/hooks/smart-contract/write/useBurnSaweran";
 import { useGetContractBalance } from "@/hooks/smart-contract/read/useGetContractBalance";
 import IDRXLogo from "../../../public/img/IDRXLogo.jpg";
+import { CREATOR_LINK_GENERATOR } from "@/config/const";
+import { useApproveAllSaweran } from "@/hooks/smart-contract/write/useApproveAllSaweran";
 
 function formatIDRX(value: string | number) {
   return Number(value).toLocaleString("en-US");
@@ -51,9 +53,18 @@ const shortAddress = (addr: string) =>
 
 export default function ProfilePage() {
   const { profile, isLoading, error, refreshProfile } = useProfile();
-  const [copied, setCopied] = useState(false);
+  const [copiedWallet, setCopiedWallet] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [showLoader, setShowLoader] = useState(false);
+  const [burningDonationIndex, setBurningDonationIndex] = useState<number | null>(null);
+  const [loadingDonationId, setLoadingDonationId] = useState<number | null>(null);
+  const [loadingType, setLoadingType] = useState<null | 'accept' | 'burn'>(null);
+  const [batchSize, setBatchSize] = useState(0);
+  const [successDonationId, setSuccessDonationId] = useState<number | null>(null);
+  const [successType, setSuccessType] = useState<null | 'accept' | 'burn'>(null);
+  const [lastProcessedId, setLastProcessedId] = useState<number | null>(null);
+  const [lastProcessedType, setLastProcessedType] = useState<null | 'accept' | 'burn'>(null);
 
   const {
     registerCreator,
@@ -61,8 +72,6 @@ export default function ProfilePage() {
     isSuccess: isRegisterSuccess,
     isError: isRegisterError,
     error: registerError,
-    hash: registerHash,
-    reset: resetRegister,
   } = useRegisterCreatorContract();
 
   const getWalletAddress = () => {
@@ -81,7 +90,6 @@ export default function ProfilePage() {
     isLoading: isContractLoading,
     isError: isContractError,
     error: contractError,
-    refetch: refetchContract,
   } = useGetCreatorContract(walletAddress);
 
   const {
@@ -113,14 +121,18 @@ export default function ProfilePage() {
     discard: contractDiscard,
     isLoading: isBalanceLoading,
     isError: isBalanceError,
-    error: balanceError,
-    refetch: refetchBalance,
   } = useGetContractBalance(contractAddress || "");
 
-  const copyToClipboard = (text: string) => {
+  const copyWalletToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedWallet(true);
+    setTimeout(() => setCopiedWallet(false), 2000);
+  };
+
+  const copyLinkToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
   };
 
   const [copiedContract, setCopiedContract] = useState(false);
@@ -170,6 +182,56 @@ export default function ProfilePage() {
     result = result.sort((a, b) => donationSort === "desc" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt);
     return result;
   }, [donations, donationStatus, donationSearch, donationSort]);
+
+  const handleApproveSaweran = (id: number) => {
+    setLoadingDonationId(id);
+    setLoadingType('accept');
+    setLastProcessedId(id);
+    setLastProcessedType('accept');
+    Promise.resolve(approveSaweran(id))
+      .finally(() => {
+        setLoadingDonationId(null);
+        setLoadingType(null);
+      });
+  };
+
+  const handleBurnSaweran = (id: number) => {
+    setLoadingDonationId(id);
+    setLoadingType('burn');
+    setLastProcessedId(id);
+    setLastProcessedType('burn');
+    Promise.resolve(burnSaweran(id))
+      .finally(() => {
+        setLoadingDonationId(null);
+        setLoadingType(null);
+      });
+  };
+
+  const pendingDonations = useMemo(() => filteredDonations.filter(d => !d.approved && !d.discarded), [filteredDonations]);
+  const {
+    approveAllSaweran,
+    isLoading: isApproveAllLoading,
+    isSuccess: isApproveAllSuccess,
+    isError: isApproveAllError,
+    error: approveAllError,
+    txHash: approveAllTxHash,
+  } = useApproveAllSaweran(contractAddress || "");
+
+  // Success notification effect
+  useEffect(() => {
+    if (isApproveSuccess && lastProcessedType === 'accept' && lastProcessedId !== null) {
+      setSuccessDonationId(lastProcessedId);
+      setSuccessType('accept');
+      const timer = setTimeout(() => setSuccessDonationId(null), 3000);
+      return () => clearTimeout(timer);
+    }
+    if (isBurnSuccess && lastProcessedType === 'burn' && lastProcessedId !== null) {
+      setSuccessDonationId(lastProcessedId);
+      setSuccessType('burn');
+      const timer = setTimeout(() => setSuccessDonationId(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isApproveSuccess, isBurnSuccess, lastProcessedId, lastProcessedType]);
 
   if (isLoading || refreshing) {
     return (
@@ -346,9 +408,9 @@ export default function ProfilePage() {
                       variant="ghost" 
                       size="icon" 
                       className="h-8 w-8 text-gray-400 hover:text-primary"
-                      onClick={() => copyToClipboard(getWalletAddress())}
+                      onClick={() => copyWalletToClipboard(getWalletAddress())}
                     >
-                      {copied ? <Check size={16} /> : <Copy size={16} />}
+                      {copiedWallet ? <Check size={16} /> : <Copy size={16} />}
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -359,6 +421,33 @@ export default function ProfilePage() {
             </div>
             <div className="bg-gray-900/50 rounded-md p-3 border border-gray-800 text-gray-400 text-sm font-mono break-all">
               {truncateAddress(getWalletAddress())}
+            </div>
+            <div className="mt-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-medium text-gray-300">
+                  Donation Link
+                </h3>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-gray-400 hover:text-primary"
+                        onClick={() => copyLinkToClipboard(`${CREATOR_LINK_GENERATOR}/explore/${profile.idUser}`)}
+                      >
+                        {copiedLink ? <Check size={16} /> : <Copy size={16} />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Copy donation link</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="bg-gray-900/50 rounded-md p-3 border border-gray-800 text-gray-400 text-sm font-mono break-all">
+                {`${CREATOR_LINK_GENERATOR}/explore/${profile.idUser}`}
+              </div>
             </div>
           </div>
           
@@ -534,7 +623,7 @@ export default function ProfilePage() {
                   <div className="rounded-lg bg-gradient-to-br from-red-900/40 to-red-800/10 border border-red-700 p-3 sm:p-4 flex flex-col items-center shadow">
                     <span className="text-xs sm:text-xs text-red-300 font-semibold mb-1">Burned</span>
                     <span className="text-xl sm:text-2xl font-bold text-red-400">{isBalanceLoading ? '...' : contractDiscard.toLocaleString()} <span className="text-base font-normal"><Image src={IDRXLogo} alt="IDRX" width={20} height={20} className="inline-block rounded-full mb-2" /></span></span>
-                  </div>
+                  </div>  
                 </div>
                 {isBalanceError && (
                   <div className="text-red-400 text-xs mb-2">Failed to load balance</div>
@@ -582,89 +671,138 @@ export default function ProfilePage() {
                       No donations found.
                     </div>
                   ) : (
-                    <div className="space-y-2 max-h-60 overflow-y-auto">
-                      {filteredDonations.map((donation, idx) => (
-                        <div
-                          key={donation.penyawer + "-" + donation.createdAt + "-" + idx}
-                          className={`bg-gray-800/70 rounded-md p-3 sm:p-4 text-xs sm:text-sm text-gray-200 flex flex-col gap-2 w-full max-w-2xl mx-auto text-left break-all shadow-sm border border-gray-700 ${!(donation.approved || donation.discarded) ? "ring-2 ring-yellow-400/60" : ""}`}
-                        >
-                          <div className="break-all">
-                            <span className="font-semibold">From:</span>{" "}
-                            <span className="break-all">{donation.penyawer}</span>
-                          </div>
-                          <div>
-                            <span className="font-semibold">Amount:</span>{" "}
-                            {formatIDRX(donation.value)} IDRX <Image src={IDRXLogo} alt="IDRX" width={15} height={15} className="inline-block rounded-full mb-1" />
-                          </div>
-                          {donation.note && (
-                            <div className="break-words">
-                              <span className="font-semibold">Note:</span>{" "}
-                              {donation.note}
-                            </div>
+                    <>
+                      {donationStatus === "pending" && pendingDonations.length > 1 && (
+                        <div className="mb-4 flex flex-col sm:flex-row items-center gap-2">
+                          <input
+                            type="number"
+                            min={1}
+                            max={pendingDonations.length}
+                            value={batchSize || pendingDonations.length}
+                            onChange={e => setBatchSize(Number(e.target.value))}
+                            className="px-2 py-1 rounded bg-gray-900 border border-gray-700 text-xs text-white w-24"
+                            placeholder="Batch size"
+                          />
+                          <Button
+                            onClick={() => approveAllSaweran(pendingDonations[0].id, batchSize || pendingDonations.length)}
+                            disabled={isApproveAllLoading}
+                            className="bg-green-600 hover:bg-green-700 text-white "
+                          >
+                            {isApproveAllLoading ? "Accepting All..." : `Accept All Donations (${batchSize || pendingDonations.length})`}
+                          </Button>
+                          {isApproveAllSuccess && (
+                            <span className="text-green-400 text-xs ml-2">All pending donations accepted!</span>
                           )}
-                          <div>
-                            <span className="font-semibold">Date:</span>{" "}
-                            {new Date(
-                              donation.createdAt * 1000,
-                            ).toLocaleString()}
-                          </div>
-                          <div>
-                            <span className="font-semibold">Status:</span>{" "}
-                            <span
-                              className={`${donation.approved ? "text-green-400" : donation.discarded ? "text-red-400" : "text-yellow-400"}`}
-                            >
-                              {donation.approved
-                                ? "Approved"
-                                : donation.discarded
-                                  ? "Burned"
-                                  : "Pending"}
-                            </span>
-                          </div>
-                          {!(donation.approved || donation.discarded) && (
-                            <div className="flex flex-col sm:flex-row gap-2 mt-2 sticky bottom-0 z-10">
-                              <Button
-                                size="sm"
-                                className="bg-green-500 hover:bg-green-600 w-full sm:w-auto"
-                                disabled={isApproveLoading || isBurnLoading}
-                                onClick={() => approveSaweran(idx)}
-                              >
-                                {isApproveLoading ? "Accepting..." : "Accept"}
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                className="w-full sm:w-auto"
-                                disabled={isApproveLoading || isBurnLoading}
-                                onClick={() => burnSaweran(idx)}
-                              >
-                                {isBurnLoading ? "Burning..." : "Burn"}
-                              </Button>
-                            </div>
-                          )}
-                          {/* Tampilkan error jika ada */}
-                          {isApproveError && (
-                            <div className="text-red-400 text-xs">
-                              {approveError?.message || "Failed to approve."}
-                            </div>
-                          )}
-                          {isBurnError && (
-                            <div className="text-red-400 text-xs">
-                              {burnError?.message || "Failed to burn."}
-                            </div>
-                          )}
-                          {isApproveSuccess && (
-                            <div className="text-green-400 text-xs">
-                              Donation approved!
-                            </div>
-                          )}
-                          {isBurnSuccess && (
-                            <div className="text-yellow-400 text-xs">
-                              Donation burned!
-                            </div>
+                          {isApproveAllError && (
+                            <span className="text-red-400 text-xs ml-2">{approveAllError?.message || "Failed to accept all."}</span>
                           )}
                         </div>
-                      ))}
-                    </div>
+                      )}
+                      <div className="space-y-2 max-h-60 overflow-y-auto">
+                        {filteredDonations.map((donation) => (
+                          <div
+                            key={donation.penyawer + '-' + donation.createdAt + '-' + donation.id}
+                            className={`bg-gray-800/70 rounded-md p-3 sm:p-4 text-xs sm:text-sm text-gray-200 flex flex-col gap-2 w-full max-w-2xl mx-auto text-left break-all shadow-sm border border-gray-700`}
+                          >
+                            <div className="break-all">
+                              <span className="font-semibold">From:</span>{" "}
+                              <span className="break-all">{donation.penyawer}</span>
+                            </div>
+                            <div>
+                              <span className="font-semibold">Amount:</span>{" "}
+                              {formatIDRX(donation.value)} IDRX <Image src={IDRXLogo} alt="IDRX" width={15} height={15} className="inline-block rounded-full mb-1" />
+                            </div>
+                            {donation.note && (
+                              <div className="break-words">
+                                <span className="font-semibold">Note:</span>{" "}
+                                {donation.note}
+                              </div>
+                            )}
+                            <div>
+                              <span className="font-semibold">Date:</span>{" "}
+                              {new Date(
+                                donation.createdAt * 1000,
+                              ).toLocaleString()}
+                            </div>
+                            <div>
+                              <span className="font-semibold">Status:</span>{" "}
+                              <span
+                                className={`${donation.approved ? "text-green-400" : donation.discarded ? "text-red-400" : "text-yellow-400"}`}
+                              >
+                                {donation.approved
+                                  ? "Approved"
+                                  : donation.discarded
+                                    ? "Burned"
+                                    : "Pending"}
+                              </span>
+                            </div>
+                            {!(donation.approved || donation.discarded) && (
+                              <div className="flex flex-col sm:flex-row gap-2 mt-2 sticky bottom-0 z-10">
+                                {loadingDonationId === donation.id && loadingType === 'burn' ? (
+                                  <Button
+                                    size="sm"
+                                    variant="destructive"
+                                    className="w-full sm:w-auto"
+                                    disabled
+                                  >
+                                    Burning...
+                                  </Button>
+                                ) : loadingDonationId === donation.id && loadingType === 'accept' ? (
+                                  <Button
+                                    size="sm"
+                                    className="bg-green-500 hover:bg-green-600 w-full sm:w-auto"
+                                    disabled
+                                  >
+                                    Accepting...
+                                  </Button>
+                                ) : loadingDonationId === null ? (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      className="bg-green-500 hover:bg-green-600 w-full sm:w-auto"
+                                      disabled={isApproveLoading || isBurnLoading}
+                                      onClick={() => handleApproveSaweran(donation.id)}
+                                    >
+                                      Accept
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
+                                      className="w-full sm:w-auto"
+                                      disabled={isApproveLoading || isBurnLoading}
+                                      onClick={() => handleBurnSaweran(donation.id)}
+                                    >
+                                      Burn
+                                    </Button>
+                                  </>
+                                ) : null}
+                              </div>
+                            )}
+                            {/* Tampilkan error jika ada */}
+                            {isApproveError && (
+                              <div className="text-red-400 text-xs">
+                                {approveError?.message || "Failed to approve."}
+                              </div>
+                            )}
+                            {isBurnError && (
+                              <div className="text-red-400 text-xs">
+                                {burnError?.message || "Failed to burn."}
+                              </div>
+                            )}
+                            {successDonationId === donation.id && successType === 'accept' && (
+                              <div className="text-green-400 text-xs">
+                                Donation approved!
+                              </div>
+                            )}
+                            {successDonationId === donation.id && successType === 'burn' && (
+                              <div className="text-yellow-400 text-xs">
+                                Donation burned!
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
                   )}
               </div>
               </>

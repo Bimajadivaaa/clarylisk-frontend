@@ -295,13 +295,18 @@ export default function CreatorProfilePage() {
                     </label>
                     <Input
                       type="number"
-                      min="0"
+                      min="101"
                       step="any"
-                      placeholder="Amount (IDRX)"
+                      placeholder="Amount (min. 101 IDRX)"
                       value={donateAmount}
                       onChange={(e) => setDonateAmount(e.target.value)}
-                      className="bg-gray-800/50 border-gray-700 text-white"
+                      className={`bg-gray-800/50 border-gray-700 text-white ${donateAmount && Number(donateAmount) < 101 ? 'border-red-500' : ''}`}
                     />
+                    {donateAmount && Number(donateAmount) < 101 && (
+                      <p className="text-red-400 text-xs mt-1">
+                        Minimum donation amount is 101 IDRX
+                      </p>
+                    )}
                     <Input
                       type="text"
                       placeholder="Note (optional)"
@@ -318,7 +323,7 @@ export default function CreatorProfilePage() {
                       disabled={
                         isDonateLoading ||
                         !donateAmount ||
-                        Number(donateAmount) <= 0
+                        Number(donateAmount) < 101
                       }
                       className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white mt-2"
                     >
@@ -347,7 +352,11 @@ export default function CreatorProfilePage() {
                       <div className="text-green-500 text-xs">
                         Donation successful!
                         <br />
-                        Tx: {donateHash}
+                        {/* Tx: {donateHash} */}
+                        <br />
+                        <a href={`https://sepolia-blockscout.lisk.com/tx/${donateHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-500">
+                          View on Explorer
+                        </a>
                       </div>
                     )}
                     {isDonateError && (

@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from 'next';
 
-const DOMAIN = 'next-dapp-matteocelani.vercel.app';
-
 const siteConfig = {
   title: 'Clarylisk',
   description:
@@ -9,8 +7,6 @@ const siteConfig = {
   keywords:
     'Clarylisk, Ethereum, Blockchain, Creator Profiles, Donations, Transactions',
   author: 'Clarylisk',
-  url: DOMAIN,
-  image: `${DOMAIN}/img/logo.png`,
 } as const;
 
 export const viewport: Viewport = {
@@ -22,32 +18,56 @@ export const viewport: Viewport = {
 } as const;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(`https://${DOMAIN}`),
   title: siteConfig.title,
   description: siteConfig.description,
   keywords: siteConfig.keywords,
   authors: [{ name: siteConfig.author }],
   manifest: '/site.webmanifest',
   icons: {
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
     icon: [
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      {
+        url: '/img/logo.png', // Path relatif dari folder public
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
+    // Tambahkan juga ukuran lain untuk kompatibilitas yang lebih baik
+    apple: [
+      {
+        url: '/img/logo.png',
+        sizes: '180x180',
+        type: 'image/png',
+      },
+    ],
+    shortcut: '/img/logo.png',
+    // Tambahkan favicon klasik 16x16 dan 32x32 juga
+    other: [
+      {
+        url: '/favicon.ico',
+        sizes: '16x16',
+        type: 'image/x-icon',
+      },
+      {
+        url: '/img/favicon-32x32.png',
+        sizes: '32x32',
+        type: 'image/png',
+      },
     ],
   },
   openGraph: {
     type: 'website',
-    url: siteConfig.url,
     title: siteConfig.title,
     description: siteConfig.description,
-    images: [{ url: siteConfig.image }],
+    images: [
+      {
+        url: '/img/logo.png', // Path relatif dari folder public
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: siteConfig.title,
     description: siteConfig.description,
-    images: [siteConfig.image],
+    images: ['/img/logo.png'], // Path relatif dari folder public
   },
 } as const;

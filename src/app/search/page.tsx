@@ -189,7 +189,7 @@ export default function SearchPage() {
               <Button
                 variant="outline"
                 size="sm"
-                className="bg-gray-900/50 border-gray-800 text-gray-400 hover:bg-gray-800/50"
+                className="bg-gray-900/50 border-gray-800 text-gray-400 hover:bg-gray-800/50 hover:text-white"
                 onClick={() =>
                   window.open(
                     `https://sepolia-blockscout.lisk.com/address/${searchQuery}?tab=txs`,

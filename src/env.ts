@@ -20,6 +20,7 @@ export const env = createEnv({
     NEXT_PUBLIC_CREATOR_HUB_FACTORY: z.string().min(1),
     // NEXT_PUBLIC_CREATOR_HUB_CONTRACT: z.string().min(1),
     NEXT_PUBLIC_IDRX_CONTRACT: z.string().min(1),
+    NEXT_PUBLIC_CREATOR_LINK_GENERATOR: z.string().min(1),
   },
   /*
    * Due to how Next.js bundles environment variables on Edge and Client,
@@ -36,5 +37,6 @@ export const env = createEnv({
     NEXT_PUBLIC_CREATOR_HUB_FACTORY: process.env.NEXT_PUBLIC_CREATOR_HUB_FACTORY,
     // NEXT_PUBLIC_CREATOR_HUB_CONTRACT: process.env.NEXT_PUBLIC_CREATOR_HUB_CONTRACT,
     NEXT_PUBLIC_IDRX_CONTRACT: process.env.NEXT_PUBLIC_IDRX_CONTRACT,
+    NEXT_PUBLIC_CREATOR_LINK_GENERATOR: process.env.NEXT_PUBLIC_CREATOR_LINK_GENERATOR,
   },
 });

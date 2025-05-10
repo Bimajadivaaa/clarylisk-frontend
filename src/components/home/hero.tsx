@@ -9,7 +9,6 @@ import logo from "../../../public/img/newlogo.png";
 import Link from "next/link";
 
 export default function Hero() {
-  // State for client-side generated random values
   const [gridItems, setGridItems] = useState<
     Array<{
       opacity: number;
@@ -50,50 +49,52 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative z-10 container px-4 mx-auto text-center">
-        <h1 className="text-6xl md:text-7xl font-bold text-white">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-600 flex items-center justify-center">
-            <span className="ml-10">Clarylisk</span>
-            <Image
-              src={logo}
-              alt="logo"
-              width={200}
-              height={200}
-              className="ml-[-3rem]"
-            />
-          </span>
-        </h1>
-        <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto mb-10">
+        <div className="flex flex-col items-center justify-center mb-2">
+          <Image
+            src={logo}
+            alt="logo"
+            width={80}
+            height={80}
+            className="w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 mb-2"
+          />
+          <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-600">
+              Clarylisk
+            </span>
+          </h1>
+        </div>
+        <p className="text-base sm:text-lg md:text-2xl text-white/80 max-w-3xl mx-auto mt-3 sm:mt-6 md:mt-8 mb-5 sm:mb-8 md:mb-10 px-2 sm:px-4">
           Transforming online gambling donations into positive impact through
           transparent blockchain technology
         </p>
 
-        <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+        <div className="flex flex-col gap-3 sm:flex-row justify-center items-center sm:gap-4 px-2 sm:px-4 mb-2">
           <Button
             size="lg"
-            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg"
+            className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 shadow-lg text-base sm:text-lg"
           >
             <Link href="/register">Register as Creator</Link>
           </Button>
           <Button
             variant="outline"
             size="lg"
-            className="border-white/20 text-black hover:bg-white/10"
+            className="w-full sm:w-auto border-white/20 text-black hover:bg-white/10 text-base sm:text-lg"
           >
             Learn How It Works
           </Button>
         </div>
 
-        <div className="mt-20 flex justify-center">
-          <div className="flex items-center gap-4 p-3 rounded-full bg-white/5 backdrop-blur-lg border border-white/10">
-            <div className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10">
+        <div className="mt-6 sm:mt-12 md:mt-20 flex justify-center px-2 sm:px-4">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-full bg-white/5 backdrop-blur-lg border border-white/10 w-full sm:w-auto">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 w-full sm:w-auto justify-center">
               <Flame className="w-4 h-4 text-red-500" />
-              <span className="text-white">
+              <span className="text-white text-xs sm:text-sm">
                 <span className="font-bold">1000,000 IDRX</span> burned
               </span>
             </div>
-            <div className="flex items-center gap-2 px-4 py-1.5">
+            <div className="flex items-center gap-2 px-3 py-1 w-full sm:w-auto justify-center">
               <BarChart3 className="w-4 h-4 text-green-500" />
-              <span className="text-white">
+              <span className="text-white text-xs sm:text-sm">
                 <span className="font-bold">5,243</span> Creator Registered
               </span>
             </div>
@@ -102,9 +103,9 @@ export default function Hero() {
       </div>
 
       {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+      <div className="absolute bottom-3 sm:bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
         <svg
-          className="w-6 h-6 text-white/50"
+          className="w-5 h-5 sm:w-6 sm:h-6 text-white/50"
           fill="none"
           strokeWidth="2"
           viewBox="0 0 24 24"

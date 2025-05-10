@@ -7,6 +7,8 @@ export const XELLAR_APP_ID = env.NEXT_PUBLIC_XELLAR_APP_ID;
 export const CREATOR_HUB_FACTORY =
   env.NEXT_PUBLIC_CREATOR_HUB_FACTORY as `0x${string}`;
 export const IDRX_CONTRACT = env.NEXT_PUBLIC_IDRX_CONTRACT as `0x${string}`;
+export const CREATOR_LINK_GENERATOR =
+  env.NEXT_PUBLIC_CREATOR_LINK_GENERATOR as `0x${string}`;
 
 export const CREATOR_HUB_FACTORY_ABI = [
   {
@@ -183,6 +185,7 @@ export const CREATOR_HUB_FACTORY_ABI = [
     outputs: [
       {
         components: [
+          { internalType: "uint256", name: "id", type: "uint256" },
           { internalType: "address", name: "penyawer", type: "address" },
           { internalType: "uint96", name: "value", type: "uint96" },
           { internalType: "uint32", name: "createdAt", type: "uint32" },
@@ -210,6 +213,13 @@ export const CREATOR_HUB_FACTORY_ABI = [
       { internalType: "address[]", name: "", type: "address[]" },
       { internalType: "uint256", name: "", type: "uint256" },
     ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getFactoryBalances",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     stateMutability: "view",
     type: "function",
   },
@@ -568,6 +578,7 @@ export const CREATOR_HUB_ABI = [
     outputs: [
       {
         components: [
+          { internalType: "uint256", name: "id", type: "uint256" },
           { internalType: "address", name: "penyawer", type: "address" },
           { internalType: "uint96", name: "value", type: "uint96" },
           { internalType: "uint32", name: "createdAt", type: "uint32" },
@@ -589,12 +600,15 @@ export const CREATOR_HUB_ABI = [
     inputs: [{ internalType: "uint256", name: "id", type: "uint256" }],
     name: "getSaweran",
     outputs: [
+      { internalType: "uint256", name: "saweranId", type: "uint256" },
       { internalType: "address", name: "penyawer", type: "address" },
       { internalType: "uint96", name: "value", type: "uint96" },
       { internalType: "string", name: "note", type: "string" },
       { internalType: "uint32", name: "createdAt", type: "uint32" },
       { internalType: "bool", name: "approved", type: "bool" },
       { internalType: "bool", name: "discarded", type: "bool" },
+      { internalType: "uint32", name: "approvedAt", type: "uint32" },
+      { internalType: "uint32", name: "discardedAt", type: "uint32" },
     ],
     stateMutability: "view",
     type: "function",
@@ -616,6 +630,7 @@ export const CREATOR_HUB_ABI = [
     outputs: [
       {
         components: [
+          { internalType: "uint256", name: "id", type: "uint256" },
           { internalType: "address", name: "penyawer", type: "address" },
           { internalType: "uint96", name: "value", type: "uint96" },
           { internalType: "uint32", name: "createdAt", type: "uint32" },
@@ -731,6 +746,7 @@ export const CREATOR_HUB_ABI = [
     inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
     name: "sawerans",
     outputs: [
+      { internalType: "uint256", name: "id", type: "uint256" },
       { internalType: "address", name: "penyawer", type: "address" },
       { internalType: "uint96", name: "value", type: "uint96" },
       { internalType: "uint32", name: "createdAt", type: "uint32" },
@@ -762,13 +778,6 @@ export const CREATOR_HUB_ABI = [
       { internalType: "uint96", name: "_processingFee", type: "uint96" },
     ],
     name: "updateProcessingFee",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "withdraw",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
