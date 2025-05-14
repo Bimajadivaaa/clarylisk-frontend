@@ -10,6 +10,7 @@ import CustomConnectButton from '@/components/connect-wallet/custom-connect-wall
 import { Button } from '@/components/ui/button';
 import logo from "../../public/img/newlogo.png";
 import { usePathname } from 'next/navigation';
+import Cookies from "js-cookie";
 
 const navLinks = [
   { name: 'Home', href: '/' },
@@ -22,8 +23,11 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const [token, setToken] = useState(() => Cookies.get("token"));
+
+  // Hanya tampilkan Profile jika ada token
   const filteredNavLinks = navLinks.filter(
-    link => !(link.name === 'Profile' && (pathname === '/' || pathname === '/register' || pathname === '/login'))
+    link => link.name !== 'Profile' || (link.name === 'Profile' && token)
   );
 
   useEffect(() => {
@@ -37,6 +41,13 @@ export default function Header() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setToken(Cookies.get("token"));
+    }, 1000); // cek token setiap detik
+    return () => clearInterval(interval);
   }, []);
 
   return (
@@ -111,17 +122,6 @@ export default function Header() {
                 </Link>
               ))}
             </nav>
-            
-            <div className="mt-auto mb-8 space-y-4">
-              <Button
-                variant="outline"
-                className="w-full border-white/20 text-white hover:bg-white/10"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                <User className="w-4 h-4 mr-2" />
-                Profile
-              </Button>
-            </div>
           </div>
         </div>
       )}

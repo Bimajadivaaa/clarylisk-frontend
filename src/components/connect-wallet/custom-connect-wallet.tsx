@@ -54,7 +54,7 @@ export default function CustomConnectButton() {
               {account?.address.slice(0, 6)}...
               {account?.address.slice(-4)}
             </Button>
-            {!isLoginPage && (
+            {/* {!isLoginPage && (
               <Button
                 onClick={logout}
                 type="button"
@@ -64,7 +64,7 @@ export default function CustomConnectButton() {
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
-            )}
+            )} */}
           </div>
         );
       }}

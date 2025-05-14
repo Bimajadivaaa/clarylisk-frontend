@@ -50,18 +50,18 @@ export default function Hero() {
       {/* Content */}
       <div className="relative z-10 container px-4 mx-auto text-center">
         <div className="flex flex-col items-center justify-center mb-2">
-          <Image
-            src={logo}
-            alt="logo"
+            <Image
+              src={logo}
+              alt="logo"
             width={80}
             height={80}
             className="w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 mb-2"
-          />
+            />
           <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tight">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-blue-600">
               Clarylisk
-            </span>
-          </h1>
+          </span>
+        </h1>
         </div>
         <p className="text-base sm:text-lg md:text-2xl text-white/80 max-w-3xl mx-auto mt-3 sm:mt-6 md:mt-8 mb-5 sm:mb-8 md:mb-10 px-2 sm:px-4">
           Transforming online gambling donations into positive impact through

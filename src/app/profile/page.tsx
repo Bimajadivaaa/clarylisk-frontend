@@ -43,6 +43,8 @@ import { useGetContractBalance } from "@/hooks/smart-contract/read/useGetContrac
 import IDRXLogo from "../../../public/img/IDRXLogo.jpg";
 import { CREATOR_LINK_GENERATOR } from "@/config/const";
 import { useApproveAllSaweran } from "@/hooks/smart-contract/write/useApproveAllSaweran";
+import Cookies from "js-cookie";
+import { useGetRiskMessage } from "@/hooks/API/useGetRiskMesage";
 
 function formatIDRX(value: string | number) {
   return Number(value).toLocaleString("en-US");
@@ -65,6 +67,8 @@ export default function ProfilePage() {
   const [successType, setSuccessType] = useState<null | 'accept' | 'burn'>(null);
   const [lastProcessedId, setLastProcessedId] = useState<number | null>(null);
   const [lastProcessedType, setLastProcessedType] = useState<null | 'accept' | 'burn'>(null);
+  const [riskMap, setRiskMap] = useState<{ [id: number]: boolean | null }>({});
+  const { checkRisk } = useGetRiskMessage();
 
   const {
     registerCreator,
@@ -217,6 +221,29 @@ export default function ProfilePage() {
     txHash: approveAllTxHash,
   } = useApproveAllSaweran(contractAddress || "");
 
+  // Cek risk untuk semua pending donation saat filter 'pending'
+  useEffect(() => {
+    if (donationStatus === "pending") {
+      pendingDonations.forEach((donation) => {
+        if (riskMap[donation.id] === undefined && donation.note) {
+          checkRisk(donation.note).then(({ isRisk }) => {
+            setRiskMap((prev) => ({ ...prev, [donation.id]: isRisk }));
+          });
+        } else if (riskMap[donation.id] === undefined && !donation.note) {
+          setRiskMap((prev) => ({ ...prev, [donation.id]: false })); // treat empty note as safe
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [donationStatus, pendingDonations]);
+
+  // Accept all only for safe donations
+  const handleApproveAllSafe = () => {
+    const safeDonations = pendingDonations.filter(d => riskMap[d.id] === false);
+    if (safeDonations.length === 0) return;
+    safeDonations.forEach(d => approveSaweran(d.id));
+  };
+
   // Success notification effect
   useEffect(() => {
     if (isApproveSuccess && lastProcessedType === 'accept' && lastProcessedId !== null) {
@@ -232,6 +259,11 @@ export default function ProfilePage() {
       return () => clearTimeout(timer);
     }
   }, [isApproveSuccess, isBurnSuccess, lastProcessedId, lastProcessedType]);
+
+  const handleLogout = () => {
+    Cookies.remove("token");
+    window.location.href = "/login";
+  };
 
   if (isLoading || refreshing) {
     return (
@@ -368,7 +400,16 @@ export default function ProfilePage() {
           </div>
         </div>
       )}
-      <Card className="w-full max-w-xl bg-black/60 border border-gray-800 backdrop-blur-sm shadow-[0_0_15px_rgba(255,255,255,0.07)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all duration-300">
+      <Card className="w-full max-w-xl bg-black/60 border border-gray-800 backdrop-blur-sm shadow-[0_0_15px_rgba(255,255,255,0.07)] hover:shadow-[0_0_20px_rgba(255,255,255,0.1)] transition-all duration-300 relative">
+        {Cookies.get("token") && (
+          <Button
+            onClick={handleLogout}
+            variant="outline"
+            className="absolute top-4 right-4 border-red-500 text-red-400 hover:text-black px-5 py-1 bg-red-900/20"
+          >
+            Logout
+          </Button>
+        )}
         <CardHeader className="flex flex-col items-center space-y-4">
           <div className="relative">
             <Avatar className="h-24 w-24 border-2 border-primary/50 shadow-glow">
@@ -445,7 +486,7 @@ export default function ProfilePage() {
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <div className="bg-gray-900/50 rounded-md p-3 border border-gray-800 text-gray-400 text-sm font-mono break-all">
+              <div className="bg-gray-900/50 rounded-md p-3 border border-gray-800 text-blue-300 font-bold underline text-md font-mono break-all">
                 {`${CREATOR_LINK_GENERATOR}/explore/${profile.idUser}`}
               </div>
             </div>
@@ -684,11 +725,11 @@ export default function ProfilePage() {
                             placeholder="Batch size"
                           />
                           <Button
-                            onClick={() => approveAllSaweran(pendingDonations[0].id, batchSize || pendingDonations.length)}
+                            onClick={handleApproveAllSafe}
                             disabled={isApproveAllLoading}
                             className="bg-green-600 hover:bg-green-700 text-white "
                           >
-                            {isApproveAllLoading ? "Accepting All..." : `Accept All Donations (${batchSize || pendingDonations.length})`}
+                            {isApproveAllLoading ? "Accepting All..." : `Accept All Donations (Safe Only)`}
                           </Button>
                           {isApproveAllSuccess && (
                             <span className="text-green-400 text-xs ml-2">All pending donations accepted!</span>
@@ -778,7 +819,15 @@ export default function ProfilePage() {
                                 ) : null}
                               </div>
                             )}
-                            {/* Tampilkan error jika ada */}
+                            {riskMap[donation.id] === undefined && (
+                              <div className="text-gray-400 text-xs mb-1">Checking risk...</div>
+                            )}
+                            {riskMap[donation.id] === true && (
+                              <div className="text-yellow-400 text-xs font-bold mb-1">⚠️ Risk Detected by AI</div>
+                            )}
+                            {riskMap[donation.id] === false && (
+                              <div className="text-green-400 text-xs font-bold mb-1">✅ Safe by AI</div>
+                            )}
                             {isApproveError && (
                               <div className="text-red-400 text-xs">
                                 {approveError?.message || "Failed to approve."}

@@ -123,6 +123,9 @@ export default function SearchPage() {
     );
   })();
 
+  // Sort donations by createdAt desc for All Transactions
+  const sortedDonations = [...onchainDonations].sort((a, b) => b.createdAt - a.createdAt);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 to-black pt-[8rem]">
       <div className="max-w-6xl mx-auto space-y-8">
@@ -407,7 +410,7 @@ export default function SearchPage() {
                           </tr>
                         </thead>
                         <tbody>
-                          {onchainDonations.map((d, idx) => (
+                          {sortedDonations.map((d, idx) => (
                             <tr
                               key={d.penyawer + "-" + d.createdAt + "-" + idx}
                               className="border-b border-gray-800 hover:bg-gray-800/50"
