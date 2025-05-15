@@ -354,7 +354,7 @@ export default function CreatorProfilePage() {
                         <br />
                         {/* Tx: {donateHash} */}
                         <br />
-                        <a href={`https://sepolia-blockscout.lisk.com/tx/${donateHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-500">
+                        <a href={`https://blockscout.lisk.com/tx/${donateHash}`} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-500">
                           View on Explorer
                         </a>
                       </div>

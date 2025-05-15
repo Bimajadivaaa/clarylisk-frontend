@@ -4,7 +4,7 @@ import React from "react";
 import { Config, WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { XellarKitProvider, defaultConfig, darkTheme } from "@xellar/kit";
-import { liskSepolia } from "viem/chains";
+import { liskSepolia, lisk } from "viem/chains";
 import { XELLAR_APP_ID, WALLETCONNECT_PROJECT_ID } from "@/config/const";
 
 const config = defaultConfig({
@@ -13,7 +13,8 @@ const config = defaultConfig({
   xellarAppId: XELLAR_APP_ID,
   xellarEnv: "sandbox",
   ssr: false,
-  chains: [liskSepolia],
+  // chains: [liskSepolia],
+  chains: [lisk],
 }) as Config;
 
 const queryClient = new QueryClient();

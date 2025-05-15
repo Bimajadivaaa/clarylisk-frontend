@@ -195,12 +195,12 @@ export default function SearchPage() {
                 className="bg-gray-900/50 border-gray-800 text-gray-400 hover:bg-gray-800/50 hover:text-white"
                 onClick={() =>
                   window.open(
-                    `https://sepolia-blockscout.lisk.com/address/${searchQuery}?tab=txs`,
+                    `https://blockscout.lisk.com/address/${searchQuery}?tab=txs`,
                     "_blank",
                   )
                 }
               >
-                View on Lisk Sepolia Explorer{" "}
+                View on Lisk Explorer{" "}
                 <ArrowUpRight className="ml-1 h-4 w-4" />
               </Button>
             </div>
