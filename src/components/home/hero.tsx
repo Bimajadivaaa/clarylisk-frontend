@@ -79,6 +79,12 @@ export default function Hero() {
             variant="outline"
             size="lg"
             className="w-full sm:w-auto border-white/20 text-black hover:bg-white/10 text-base sm:text-lg"
+            onClick={() => {
+              const howItWorksSection = document.getElementById('how-it-works');
+              if (howItWorksSection) {
+                howItWorksSection.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
           >
             Learn How It Works
           </Button>
