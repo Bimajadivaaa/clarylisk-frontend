@@ -3,7 +3,7 @@
 import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-
+import Link from 'next/link';
 export default function Cta() {
   return (
     <section className="py-24 bg-black relative overflow-hidden">
@@ -35,14 +35,16 @@ export default function Cta() {
                   <span>Connect Wallet</span>
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button> */}
+                <Link href="https://bimajdiva.gitbook.io/clarylisk" target='_blank'>
                 <Button 
                   variant="outline" 
                   size="lg" 
-                  className="border-white/20 text-white hover:bg-white/10 w-full sm:w-auto"
+                  className="border-white/20 text-white hover:bg-white/10 w-full sm:w-auto hover:text-white"
                 >
-                  <span className='text-black'>View Documentation</span>
-                  <ExternalLink className="ml-2 w-4 h-4 text-black" />
+                  <span className='text-black hover:text-white'>View Documentation</span>
+                  <ExternalLink className="ml-2 w-4 h-4 text-black hover:text-white" />
                 </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
